@@ -7,11 +7,17 @@ class ListIamRole {
 		this.iam = iam;
 	}
 
-	listAttachedRolePolicies () {
-		this.iam.listAttachedRolePolicies((err, data) => {
-			if (err) console.log(err, err.stack);
-			else console.log(data)
-		})
+	listAttachedRolePolicies (roleNames: []) {
+		roleNames.forEach(roleName => {
+			const params = {
+				RoleName: roleName
+			}
+			this.iam.listAttachedRolePolicies(params, (err, data) => {
+				if (err) console.log(err, err.stack);
+				else console.log(data)
+			})			
+		});
+
 	}
 
 	listRoleNames () {
@@ -21,7 +27,15 @@ class ListIamRole {
 				const roleNames = data.Roles.map(roleInfo => {
 					return roleInfo.RoleName
 				});
-				console.log(roleNames);
+				roleNames.forEach(roleName => {
+					const params = {
+						RoleName: roleName
+					}
+					this.iam.listAttachedRolePolicies(params, (err, data) => {
+						if (err) console.log(err, err.stack);
+						else console.log(data.AttachedPolicies)
+					})			
+				});
 			}
 		})
 	}
