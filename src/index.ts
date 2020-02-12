@@ -22,6 +22,16 @@ class ListIamRole {
 
 	}
 
+  private listRolePolicies(roleName: string) {
+    const params = {	
+      RoleName: roleName	
+    }
+    this.iam.listAttachedRolePolicies(params, (err, data) => {
+      if (err) console.log(err, err.stack);
+    	else console.log(data.AttachedPolicies)
+    })		  
+  }
+			
 	listRoleNames () {
 		this.iam.listRoles((err, data) => {
 			if (err) console.log(err, err.stack);
@@ -30,14 +40,8 @@ class ListIamRole {
 					return roleInfo.RoleName
 				});
 				roleNames.forEach(roleName => {
-					const params = {
-						RoleName: roleName
-					}
-					this.iam.listAttachedRolePolicies(params, (err, data) => {
-						if (err) console.log(err, err.stack);
-						else console.log(data.AttachedPolicies)
-					})			
-				});
+          this.listRolePolicies(roleName);
+        });   
 			}
 		})
 	}
