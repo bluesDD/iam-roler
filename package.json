@@ -12,7 +12,7 @@
     "start": "node ."
   },
   "bin": {
-    "awesome-cmd": "dist/index.js"
+    "cmdtest": "dist/index.js"
   },
   "repository": {
     "type": "git",
