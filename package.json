@@ -11,6 +11,9 @@
     "build": "npm-run-all clean tsc",
     "start": "node ."
   },
+  "bin": {
+    "awesome-cmd": "dist/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bluesDD/iam-roler.git"

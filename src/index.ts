@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { IAM } from "aws-sdk";
 
 class ListIamRole {
