@@ -12,7 +12,7 @@
     "start": "node ."
   },
   "bin": {
-    "cmdtest": "dist/index.js"
+    "iam-roler": "dist/index.js"
   },
   "repository": {
     "type": "git",
