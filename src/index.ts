@@ -2,53 +2,59 @@
 
 import { IAM } from "aws-sdk";
 
-class ListIamRole {
+class IAMRoleArnCollector {
 	readonly iam: IAM
+	roleNames: null | Promise<any>;
 
 	constructor(iam: IAM) {
 		this.iam = iam;
+		this.roleNames = null;
 	}
 
-	listAttachedRolePolicies (roleNames: []) {
-		roleNames.forEach(roleName => {
-			const params = {
-				RoleName: roleName
-			}
-			this.iam.listAttachedRolePolicies(params, (err, data) => {
-				if (err) console.log(err, err.stack);
-				else console.log(data)
-			})			
-		});
-
-	}
-
-  private listRolePolicies(roleName: string) {
-    const params = {	
-      RoleName: roleName	
-    }
-    this.iam.listAttachedRolePolicies(params, (err, data) => {
-      if (err) console.log(err, err.stack);
-    	else console.log(data.AttachedPolicies)
-    })		  
-  }
-			
-	listRoleNames () {
-		this.iam.listRoles((err, data) => {
-			if (err) console.log(err, err.stack);
-			else { 
-				const roleNames = data.Roles.map(roleInfo => {
-					return roleInfo.RoleName
-				});
-				roleNames.forEach(roleName => {
-          this.listRolePolicies(roleName);
-        });   
-			}
-		})
+	async listRoleNames () {
+		return this.roleNames = await this.iam.listRoles()
+			.promise()
+			.then(data => {
+					return data.Roles.map(roleInfo => {
+						return roleInfo.RoleName
+					})
+			})
+			.catch(err => {
+					return err;
+				}
+			)
 	}
 }
+/*
+roleNames.forEach(roleName => {
+	this.listRolePolicies(roleName);
+});  
 
+listAttachedRolePolicies (roleNames: []) {
+	roleNames.forEach(roleName => {
+		const params = {
+			RoleName: roleName
+		}
+		this.iam.listAttachedRolePolicies(params, (err, data) => {
+			if (err) console.log(err, err.stack);
+			else console.log(data)
+		})			
+	});
+
+}
+
+private listRolePolicies(roleName: string) {
+	const params = {	
+		RoleName: roleName	
+	}
+	this.iam.listAttachedRolePolicies(params, (err, data) => {
+		if (err) console.log(err, err.stack);
+		else console.log(data.AttachedPolicies)
+	})		  
+}
+*/
 const iam = new IAM();
 
-const listiamrole = new ListIamRole(iam);
+const listiamrole = new IAMRoleArnCollector(iam);
 
-listiamrole.listRoleNames();
+(async () => console.log (await listiamrole.listRoleNames()))();
