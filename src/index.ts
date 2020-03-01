@@ -2,7 +2,7 @@
 
 import { IAM } from "aws-sdk";
 
-class IAMRoleArnCollector {
+export class IAMRoleNameCollector {
 	readonly iam: IAM
 	roleNames: null | Promise<any>;
 
@@ -55,6 +55,6 @@ private listRolePolicies(roleName: string) {
 */
 const iam = new IAM();
 
-const listiamrole = new IAMRoleArnCollector(iam);
+const listiamrole = new IAMRoleNameCollector(iam);
 
 (async () => console.log (await listiamrole.listRoleNames()))();
