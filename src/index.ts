@@ -2,6 +2,8 @@
 
 import { IAM } from "aws-sdk";
 
+const iam = new IAM();
+
 export class IAMRoleNameCollector {
 	readonly iam: IAM
 	roleNames: null | Promise<any>;
@@ -24,6 +26,26 @@ export class IAMRoleNameCollector {
 				}
 			)
 	}
+}
+
+export class AttachedIAMPolicyCollector {
+	readonly iam: IAM;
+
+	constructor(iam: IAM) {
+		this.iam = iam;
+
+	}
+
+	async listAttachedPolicies (roleNames: any) {
+		const params = {	
+			RoleName: roleNames
+		}
+		return this.iam.listAttachedRolePolicies(params)
+			.promise()
+			.then(data => data.AttachedPolicies[0].PolicyName)
+			.catch(err => err);
+	}
+
 }
 /*
 roleNames.forEach(roleName => {
@@ -53,8 +75,5 @@ private listRolePolicies(roleName: string) {
 	})		  
 }
 */
-const iam = new IAM();
-
-const listiamrole = new IAMRoleNameCollector(iam);
-
-(async () => console.log (await listiamrole.listRoleNames()))();
+const listiampolicy = new AttachedIAMPolicyCollector(iam);
+(async () => console.log (await listiampolicy.listAttachedPolicies('CdkWorkshopStack-HelloHandlerServiceRole11EF7C63-1HS3I653KNLZY')))();

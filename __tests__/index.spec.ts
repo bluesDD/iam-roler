@@ -1,4 +1,4 @@
-import { IAMRoleNameCollector } from '../src/index';
+import { IAMRoleNameCollector,  } from '../src/index';
 import { IAM } from 'aws-sdk';
 
 describe('the test of IAMRoleNameCollector', () => {
