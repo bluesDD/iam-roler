@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+'use strict'
 
 import { IAM } from "aws-sdk";
 
@@ -13,7 +14,7 @@ export class IAMRoleNameCollector {
 		this.roleNames = null;
 	}
 
-	async listRoleNames () {
+	async listRoleNames <T>() : Promise<T> {
 		return this.roleNames = await this.iam.listRoles()
 			.promise()
 			.then(data => {
@@ -36,13 +37,19 @@ export class AttachedIAMPolicyCollector {
 
 	}
 
-	async listAttachedPolicies (roleNames: any) {
+	async listAttachedPolicies (roleName: string) {
 		const params = {	
-			RoleName: roleNames
+			RoleName: roleName
 		}
 		return this.iam.listAttachedRolePolicies(params)
 			.promise()
-			.then(data => data.AttachedPolicies[0].PolicyName)
+			.then(data => {
+				if (data.AttachedPolicies) {
+					const PolicyNames = data.AttachedPolicies.map(policy => policy.PolicyName);
+					return PolicyNames
+				}
+				//else throw new Error
+			})
 			.catch(err => err);
 	}
 
@@ -76,4 +83,4 @@ private listRolePolicies(roleName: string) {
 }
 */
 const listiampolicy = new AttachedIAMPolicyCollector(iam);
-(async () => console.log (await listiampolicy.listAttachedPolicies('CdkWorkshopStack-HelloHandlerServiceRole11EF7C63-1HS3I653KNLZY')))();
+(async () => console.log (await listiampolicy.listAttachedPolicies('ec2-role')))();
