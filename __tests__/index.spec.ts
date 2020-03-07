@@ -1,4 +1,5 @@
 import { IAMRoleNameCollector, AttachedIAMPolicyCollector,  } from '../src/index';
+import { APIError } from '../src/CustomError';
 import { IAM } from 'aws-sdk';
 
 const iam = new IAM;
@@ -17,5 +18,14 @@ describe('AttachedIAMPolicyCollector', () => {
 	it('listAttachedPolicies', async () => {
 		const result = await listPolicies.listAttachedPolicies('AWSServiceRoleForSupport');
 		await expect(result).toContain('AWSSupportServiceRolePolicy');
+	})
+})
+
+describe('APIErrorr', () => {
+	it('api response error', async () => {
+		const testErrorMessage = 'API Response went wrong'; 
+		const apiError = new APIError(testErrorMessage);
+		expect(apiError).toBeInstanceOf(Error);
+		expect(apiError.message).toBe(testErrorMessage);
 	})
 })

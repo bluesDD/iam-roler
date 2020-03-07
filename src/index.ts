@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 'use strict'
 
-import { IAM } from "aws-sdk";
+import { IAM } from 'aws-sdk';
+import { APIError } from './CustomError';
 
 const iam = new IAM();
 
@@ -48,16 +49,14 @@ export class AttachedIAMPolicyCollector {
 					const PolicyNames = data.AttachedPolicies.map(policy => policy.PolicyName);
 					return PolicyNames
 				}
-				//else throw new Error
 			})
-			.catch(err => err);
+			.catch(err => {
+				throw new APIError(`${err} , listAttachedRolePolicies request went wrong`)
+			});
 	}
 
 }
 /*
-roleNames.forEach(roleName => {
-	this.listRolePolicies(roleName);
-});  
 
 listAttachedRolePolicies (roleNames: []) {
 	roleNames.forEach(roleName => {
