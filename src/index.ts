@@ -38,7 +38,7 @@ export class AttachedIAMPolicyCollector {
 
 	}
 
-	async listAttachedPolicies (roleName: string) {
+	async listAttachedPolicyArn (roleName: string) {
 		const params = {	
 			RoleName: roleName
 		}
@@ -46,8 +46,8 @@ export class AttachedIAMPolicyCollector {
 			.promise()
 			.then(data => {
 				if (data.AttachedPolicies) {
-					const PolicyNames = data.AttachedPolicies.map(policy => policy.PolicyName);
-					return PolicyNames
+					const PolicyArns = data.AttachedPolicies.map(policy => policy.PolicyArn);
+					return PolicyArns
 				}
 			})
 			.catch(err => {
@@ -82,4 +82,4 @@ private listRolePolicies(roleName: string) {
 }
 */
 const listiampolicy = new AttachedIAMPolicyCollector(iam);
-(async () => console.log (await listiampolicy.listAttachedPolicies('ec2-role')))();
+(async () => console.log (await listiampolicy.getPolicyInfo(['ec2-role'])))();

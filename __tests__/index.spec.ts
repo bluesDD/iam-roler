@@ -16,7 +16,7 @@ describe('AttachedIAMPolicyCollector', () => {
 	const listPolicies = new AttachedIAMPolicyCollector(iam);
 
 	it('listAttachedPolicies', async () => {
-		const result = await listPolicies.listAttachedPolicies('AWSServiceRoleForSupport');
+		const result = await listPolicies.listAttachedPolicyArn('AWSServiceRoleForSupport');
 		await expect(result).toContain('AWSSupportServiceRolePolicy');
 	})
 })
