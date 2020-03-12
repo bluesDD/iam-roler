@@ -7,15 +7,13 @@ import { APIError } from './CustomError';
 const iam = new IAM();
 
 export class IAMRoleNameCollector {
-	readonly iam: IAM
 	roleNames: null | Promise<any>;
 
-	constructor(iam: IAM) {
-		this.iam = iam;
+	constructor(readonly iam: IAM) {
 		this.roleNames = null;
 	}
 
-	async listRoleNames <T>() : Promise<T> {
+	async fetchRoleNames <T>() : Promise<T> {
 		return this.roleNames = await this.iam.listRoles()
 			.promise()
 			.then(data => {
@@ -31,14 +29,11 @@ export class IAMRoleNameCollector {
 }
 
 export class AttachedIAMPolicyCollector {
-	readonly iam: IAM;
 
-	constructor(iam: IAM) {
-		this.iam = iam;
-
+	constructor(readonly iam: IAM) {
 	}
 
-	async listAttachedPolicyArn (roleName: string) {
+	async fetchAttachedPolicyArns (roleName: string) {
 		const params = {	
 			RoleName: roleName
 		}
@@ -55,31 +50,25 @@ export class AttachedIAMPolicyCollector {
 			});
 	}
 
-}
-/*
-
-listAttachedRolePolicies (roleNames: []) {
-	roleNames.forEach(roleName => {
-		const params = {
-			RoleName: roleName
-		}
-		this.iam.listAttachedRolePolicies(params, (err, data) => {
-			if (err) console.log(err, err.stack);
-			else console.log(data)
-		})			
-	});
-
-}
-
-private listRolePolicies(roleName: string) {
-	const params = {	
-		RoleName: roleName	
+	async fetchPolicyInfo (roleNames: string[]) {
+	 	const te = roleNames.map(async name => {
+			var params = {
+				PolicyArn: name
+			};
+			try {
+				return  await this.iam.getPolicy(params).promise();
+			} catch (err) {
+				throw new APIError(`${err} , getPolicy request went wrong`)
+			}
+		})
+		return Promise.all(te);
+		
 	}
-	this.iam.listAttachedRolePolicies(params, (err, data) => {
-		if (err) console.log(err, err.stack);
-		else console.log(data.AttachedPolicies)
-	})		  
 }
-*/
+
 const listiampolicy = new AttachedIAMPolicyCollector(iam);
-(async () => console.log (await listiampolicy.getPolicyInfo(['ec2-role'])))();
+(async () => {
+		const t = await listiampolicy.fetchPolicyInfo(['arn:aws:iam::aws:policy/AmazonEC2FullAccess']);
+		console.log(t);
+	}
+)();
