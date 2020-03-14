@@ -50,7 +50,7 @@ export class AttachedIAMPolicyCollector {
 	}
 
 	async fetchPolicyInfo (roleNames: string[]) {
-	 	const te = roleNames.map(async name => {
+	 	const policyDocument = roleNames.map(async name => {
 			var params = {
 				PolicyArn: name
 			};
@@ -60,7 +60,7 @@ export class AttachedIAMPolicyCollector {
 				throw new APIError(`${err} , getPolicy request went wrong`)
 			}
 		})
-		return Promise.all(te);
+		return Promise.all(policyDocument);
 		
 	}
 }
