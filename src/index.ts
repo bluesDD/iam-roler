@@ -7,11 +7,9 @@ import { APIError } from './CustomError';
 const iam = new IAM();
 
 export class IAMRoleNameCollector {
-	readonly iam: IAM
 	roleNames: null | Promise<any>;
 
-	constructor(iam: IAM) {
-		this.iam = iam;
+	constructor(readonly iam: IAM) {
 		this.roleNames = null;
 	}
 
@@ -31,11 +29,7 @@ export class IAMRoleNameCollector {
 }
 
 export class AttachedIAMPolicyCollector {
-	readonly iam: IAM;
-
-	constructor(iam: IAM) {
-		this.iam = iam;
-
+	constructor(readonly iam: IAM) {
 	}
 
 	async listAttachedPolicies (roleName: string) {
