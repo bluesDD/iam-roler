@@ -50,30 +50,5 @@ export class AttachedIAMPolicyCollector {
 	}
 
 }
-/*
-
-listAttachedRolePolicies (roleNames: []) {
-	roleNames.forEach(roleName => {
-		const params = {
-			RoleName: roleName
-		}
-		this.iam.listAttachedRolePolicies(params, (err, data) => {
-			if (err) console.log(err, err.stack);
-			else console.log(data)
-		})			
-	});
-
-}
-
-private listRolePolicies(roleName: string) {
-	const params = {	
-		RoleName: roleName	
-	}
-	this.iam.listAttachedRolePolicies(params, (err, data) => {
-		if (err) console.log(err, err.stack);
-		else console.log(data.AttachedPolicies)
-	})		  
-}
-*/
 const listiampolicy = new AttachedIAMPolicyCollector(iam);
 (async () => console.log (await listiampolicy.listAttachedPolicies('ec2-role')))();
