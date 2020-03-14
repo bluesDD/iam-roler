@@ -13,7 +13,7 @@ export class IAMRoleNameCollector {
 		this.roleNames = null;
 	}
 
-	async listRoleNames <T>() : Promise<T> {
+	async fetchRoleNames <T>() : Promise<T> {
 		return this.roleNames = await this.iam.listRoles()
 			.promise()
 			.then(data => {
@@ -32,7 +32,7 @@ export class AttachedIAMPolicyCollector {
 	constructor(readonly iam: IAM) {
 	}
 
-	async listAttachedPolicies (roleName: string) {
+	async fetchAttachedPolicyArns (roleName: string) {
 		const params = {	
 			RoleName: roleName
 		}
@@ -40,8 +40,8 @@ export class AttachedIAMPolicyCollector {
 			.promise()
 			.then(data => {
 				if (data.AttachedPolicies) {
-					const PolicyNames = data.AttachedPolicies.map(policy => policy.PolicyName);
-					return PolicyNames
+					const PolicyArns = data.AttachedPolicies.map(policy => policy.PolicyArn);
+					return PolicyArns
 				}
 			})
 			.catch(err => {
@@ -49,6 +49,25 @@ export class AttachedIAMPolicyCollector {
 			});
 	}
 
+	async fetchPolicyInfo (roleNames: string[]) {
+	 	const te = roleNames.map(async name => {
+			var params = {
+				PolicyArn: name
+			};
+			try {
+				return  await this.iam.getPolicy(params).promise();
+			} catch (err) {
+				throw new APIError(`${err} , getPolicy request went wrong`)
+			}
+		})
+		return Promise.all(te);
+		
+	}
 }
+
 const listiampolicy = new AttachedIAMPolicyCollector(iam);
-(async () => console.log (await listiampolicy.listAttachedPolicies('ec2-role')))();
+(async () => {
+		const t = await listiampolicy.fetchPolicyInfo(['arn:aws:iam::aws:policy/AmazonEC2FullAccess']);
+		console.log(t);
+	}
+)();

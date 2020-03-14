@@ -7,7 +7,7 @@ const iam = new IAM;
 describe('the test of IAMRoleNameCollector', () => {
 	const iamRoleNames = new IAMRoleNameCollector(iam);
 	it('listrolenames returns string[]', async () => {
-		const result =  await iamRoleNames.listRoleNames();
+		const result =  await iamRoleNames.fetchRoleNames();
 		await expect(result).toContain('AWSServiceRoleForSupport');
 	})
 })
@@ -16,8 +16,8 @@ describe('AttachedIAMPolicyCollector', () => {
 	const listPolicies = new AttachedIAMPolicyCollector(iam);
 
 	it('listAttachedPolicies', async () => {
-		const result = await listPolicies.listAttachedPolicies('AWSServiceRoleForSupport');
-		await expect(result).toContain('AWSSupportServiceRolePolicy');
+		const result = await listPolicies.fetchAttachedPolicyArns('AWSServiceRoleForSupport');
+		await expect(result).toContain('arn:aws:iam::aws:policy/aws-service-role/AWSSupportServiceRolePolicy');
 	})
 })
 
