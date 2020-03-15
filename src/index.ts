@@ -3,6 +3,7 @@
 
 import { IAM } from 'aws-sdk';
 import { APIError } from './CustomError';
+import { isArray, isUndefined } from 'util';
 
 const iam = new IAM();
 
@@ -49,25 +50,40 @@ export class AttachedIAMPolicyCollector {
 			});
 	}
 
-	async fetchPolicyInfo (roleNames: string[]) {
-	 	const policyDocument = roleNames.map(async name => {
+	async fetchPolicyInfo (policyNames: string[], roleName: string) {
+	 	const policyDocument = policyNames.map(async name => {
 			var params = {
-				PolicyArn: name
+				PolicyArn: name,
+				VersionId: roleName
 			};
 			try {
-				return  await this.iam.getPolicy(params).promise();
+				return  await this.iam.getPolicyVersion(params).promise();
 			} catch (err) {
-				throw new APIError(`${err} , getPolicy request went wrong`)
+				throw new APIError(`${err}  GetPolicy request went wrong`)
 			}
 		})
-		return Promise.all(policyDocument);
-		
+		return Promise.all(policyDocument).catch(e => {
+			return e;
+		}
+		);
+	}
+}
+
+function isStringArrayAndNotEmpty(x: any): x is Array<string> {
+	if(x.length > 0) {
+		return Array.isArray(x);
+	} else {
+		return false;
 	}
 }
 
 const listiampolicy = new AttachedIAMPolicyCollector(iam);
 (async () => {
-		const t = await listiampolicy.fetchPolicyInfo(['arn:aws:iam::aws:policy/AmazonEC2FullAccess']);
-		console.log(t);
+		const policy = await listiampolicy.fetchAttachedPolicyArns("ec2-role")
+		console.log(policy);
+		if( isStringArrayAndNotEmpty(policy)) {
+			const t = await listiampolicy.fetchPolicyInfo(policy,"v1");
+			console.log(decodeURI(t[0].PolicyVersion.Document));
+	}
 	}
 )();
