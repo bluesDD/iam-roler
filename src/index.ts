@@ -3,7 +3,7 @@
 
 import { IAM } from 'aws-sdk';
 import { APIError } from './CustomError';
-import { isArray, isUndefined } from 'util';
+import { PromiseResult } from '../node_modules/aws-sdk/lib/request'
 
 const iam = new IAM();
 
@@ -50,11 +50,27 @@ export class AttachedIAMPolicyCollector {
 			});
 	}
 
-	async fetchPolicyInfo (policyNames: string[], roleName: string) {
+	async fetchLatestPolicyVersion (policyArn: string ): Promise<any> {
+		const params = {
+			PolicyArn: policyArn
+		}
+		try {
+			const results = await this.iam.listPolicyVersions(params).promise()
+			if (typeof results.Versions !== 'undefined') {
+				return results.Versions[0].VersionId;
+			} else {
+				throw new APIError('listPolicyVersion failed');
+			}
+		} catch (e) {
+			return e;
+		}
+	}
+
+	async fetchPolicyInfo (policyNames: string[], versionId: string) {
 	 	const policyDocument = policyNames.map(async name => {
 			var params = {
 				PolicyArn: name,
-				VersionId: roleName
+				VersionId: versionId
 			};
 			try {
 				return  await this.iam.getPolicyVersion(params).promise();
@@ -69,7 +85,7 @@ export class AttachedIAMPolicyCollector {
 	}
 }
 
-function isStringArrayAndNotEmpty(x: any): x is Array<string> {
+const isStringArrayAndNotEmpty = (x: any): x is Array<string> => {
 	if(x.length > 0) {
 		return Array.isArray(x);
 	} else {
@@ -77,13 +93,14 @@ function isStringArrayAndNotEmpty(x: any): x is Array<string> {
 	}
 }
 
+
 const listiampolicy = new AttachedIAMPolicyCollector(iam);
 (async () => {
 		const policy = await listiampolicy.fetchAttachedPolicyArns("ec2-role")
 		console.log(policy);
 		if( isStringArrayAndNotEmpty(policy)) {
-			const t = await listiampolicy.fetchPolicyInfo(policy,"v1");
-			console.log(decodeURI(t[0].PolicyVersion.Document));
+			const t = await listiampolicy.fetchLatestPolicyVersion('arn:aws:iam::960509685049:policy/service-role/CodeBuildBasePolicy-test-ap-northeast-1');
+			await console.log(decodeURI(t));
 	}
 	}
 )();
