@@ -3,7 +3,6 @@
 
 import { IAM } from 'aws-sdk';
 import { APIError } from './CustomError';
-import { PromiseResult } from '../node_modules/aws-sdk/lib/request'
 
 const iam = new IAM();
 
@@ -33,7 +32,7 @@ export class AttachedIAMPolicyCollector {
 	constructor(readonly iam: IAM) {
 	}
 
-	async fetchAttachedPolicyArns (roleName: string) {
+	async fetchAttachedPolicies (roleName: string) {
 		const params = {	
 			RoleName: roleName
 		}
@@ -41,8 +40,7 @@ export class AttachedIAMPolicyCollector {
 			.promise()
 			.then(data => {
 				if (data.AttachedPolicies) {
-					const PolicyArns = data.AttachedPolicies.map(policy => policy.PolicyArn);
-					return PolicyArns
+					return data.AttachedPolicies;
 				}
 			})
 			.catch(err => {
@@ -82,6 +80,7 @@ export class AttachedIAMPolicyCollector {
 			return e;
 		}
 		);
+		// TODO：クラスからポリシドキュメントを返す
 	}
 }
 
@@ -94,13 +93,13 @@ const isStringArrayAndNotEmpty = (x: any): x is Array<string> => {
 }
 
 
+
 const listiampolicy = new AttachedIAMPolicyCollector(iam);
 (async () => {
-		const policy = await listiampolicy.fetchAttachedPolicyArns("ec2-role")
+		const policy = await listiampolicy.fetchAttachedPolicies("ec2-role")
 		console.log(policy);
 		if( isStringArrayAndNotEmpty(policy)) {
-			const t = await listiampolicy.fetchLatestPolicyVersion('arn:aws:iam::960509685049:policy/service-role/CodeBuildBasePolicy-test-ap-northeast-1');
-			await console.log(decodeURI(t));
+		await console.log(2);
 	}
 	}
 )();
