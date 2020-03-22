@@ -80,8 +80,10 @@ export class AttachedIAMPolicyCollector {
 			return e;
 		}
 		);
-		// TODO：クラスからポリシドキュメントを返す
+		// TODO：policyとnameのれんそう配列をつかってよしなにする
+		// TODO: UML図いるかも...
 	}
+
 }
 
 const isStringArrayAndNotEmpty = (x: any): x is Array<string> => {
@@ -93,13 +95,11 @@ const isStringArrayAndNotEmpty = (x: any): x is Array<string> => {
 }
 
 
-
 const listiampolicy = new AttachedIAMPolicyCollector(iam);
 (async () => {
 		const policy = await listiampolicy.fetchAttachedPolicies("ec2-role")
 		console.log(policy);
 		if( isStringArrayAndNotEmpty(policy)) {
-		await console.log(2);
 	}
 	}
 )();
