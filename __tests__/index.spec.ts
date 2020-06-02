@@ -16,8 +16,10 @@ describe('AttachedIAMPolicyCollector', () => {
 	const listPolicies = new AttachedIAMPolicyCollector(iam);
 
 	it('listAttachedPolicies', async () => {
-		const result = await listPolicies.fetchAttachedPolicyArns('AWSServiceRoleForSupport');
-		await expect(result).toContain('arn:aws:iam::aws:policy/aws-service-role/AWSSupportServiceRolePolicy');
+    const result = await listPolicies.fetchAttachedPolicies('AWSServiceRoleForSupport');
+    if (result) {      
+      await expect(result[0].PolicyArn).toContain('arn:aws:iam::aws:policy/aws-service-role/AWSSupportServiceRolePolicy');
+    }
 	})
 })
 
