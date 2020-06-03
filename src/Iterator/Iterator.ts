@@ -1,6 +1,6 @@
 'use strict'
 
-export interface AuthorIterator {
+export default interface AuthorIterator {
   hasNext: () => boolean;
   next: () => Object;
 }
