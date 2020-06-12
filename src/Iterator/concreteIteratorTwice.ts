@@ -10,6 +10,7 @@ export default class AuthorListTwiceIterator implements AuthorIterator{
     return this.index < this.authors.length * 2;
   }
 
+  
   next() {
     return this.authors[this.index++];
   }
